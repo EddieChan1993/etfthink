@@ -7,8 +7,8 @@ import (
 
 func Run(path string, isUp bool) {
 	etfIns := &etfDays{
-		pinCa:    6.0,
-		turnCa:   3.0,
+		pinCa:    4.0, //关键点和次级转折幅度定义
+		turnCa:   3.0, //逆转警告幅度定义
 		starIsUp: isUp,
 	}
 	etfIns.all = initEtfData(path)

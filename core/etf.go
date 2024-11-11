@@ -48,11 +48,11 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 				fmt.Printf(" %s 持续%s后 %d天 反向\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
 				e.keepDays = 0
 				if caRate >= e.turnCa {
-					fmt.Print(fmt.Sprintf(" %s 于[%s]反向波动 %.0f点 %.4f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.turnCa, caRate))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]反向波动 %.0f点 %.2f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.turnCa, caRate))
 				}
 				if caRate >= e.pinCa {
 					e.starIsUp = false
-					fmt.Print(fmt.Sprintf("%s 于[%s]转向>=%.0f点-次级%s\n", e.log(per), e.log(e.lastPin), per.val, e.isUpTmpStr(e.starIsUp)))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.2f点->次级%s\n", e.log(per), e.log(e.lastPin), caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
 					return
 				}
@@ -66,7 +66,7 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 			e.keepDays = 0
 			if caRate >= e.pinCa {
 				e.starIsUp = false
-				fmt.Printf(" %s 【关键点1 %s】开始进入-自然%s阶段\n", e.log(per), e.lastPin.dateD, e.isUpTmpStr(e.starIsUp))
+				fmt.Printf(" %s【关键点1 %s】开始进入->自然%s阶段 \n", e.log(per), e.lastPin.dateD, e.isUpTmpStr(e.starIsUp))
 				e.pin1 = e.lastPin.val
 				e.lastPin = per
 				return
@@ -89,11 +89,11 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 				fmt.Printf(" %s 持续%s后 %d天 反向\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
 				e.keepDays = 0
 				if caRate >= e.turnCa {
-					fmt.Print(fmt.Sprintf(" %s 于[%s]反向波动 %.0f点 %.4f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.turnCa, caRate))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]反向波动 %.0f点 %.2f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.turnCa, caRate))
 				}
 				if caRate >= e.pinCa {
 					e.starIsUp = true
-					fmt.Print(fmt.Sprintf(" %s 于[%s]转向>=%.0f点-次级%s\n", e.log(per), e.log(e.lastPin), per.val, e.isUpTmpStr(e.starIsUp)))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.2f点->次级%s\n", e.log(per), e.log(e.lastPin), caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
 					return
 				}
@@ -107,7 +107,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 			e.keepDays = 0
 			if caRate >= e.pinCa {
 				e.starIsUp = true
-				fmt.Printf(" %s 【关键点2 %s】开始进入-自然%s阶段\n", e.log(per), e.lastPin.dateD, e.isUpTmpStr(e.starIsUp))
+				fmt.Printf(" %s 【关键点2 %s】开始进入->自然%s阶段\n", e.log(per), e.lastPin.dateD, e.isUpTmpStr(e.starIsUp))
 				e.pin2 = e.lastPin.val
 				e.lastPin = per
 				return
