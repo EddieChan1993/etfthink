@@ -8,7 +8,7 @@ import (
 type etfDays struct {
 	all      []*etfDaysPer
 	pinCa    float64 //关键点变化幅度 6%
-	turnCa   float64 //移转信号幅度 3%
+	turnCa   float64 //逆转信号幅度 3%
 	pin1     float64 //关键点1
 	pin2     float64 //关键点2
 	starIsUp bool
@@ -38,23 +38,25 @@ func (e *etfDays) think() {
 
 func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 	if e.pin1 != 0 {
-		if per.val > e.pin1 && math.Abs(per.val-e.pin1)/e.pin1*100 > e.turnCa {
+		if per.val > e.pin1 {
 			e.keepDays++
-			fmt.Printf(" %s 突破【关键点1】，%s趋势恢复\n", e.log(per), e.isUpStr(e.starIsUp))
-			e.pin1 = 0
-			e.pin2 = 0
+			if math.Abs(per.val-e.pin1)/e.pin1*100 > e.turnCa {
+				fmt.Printf(" %s 彻底突破【关键点1】，%s趋势形成\n", e.log(per), e.isUpStr(e.starIsUp))
+				e.pin1 = 0
+				e.pin2 = 0
+			} else {
+				fmt.Printf(" %s 突破【关键点1】，%s中\n", e.log(per), e.isUpStr(e.starIsUp))
+			}
 		} else {
 			if e.lastPin.val > per.val {
 				e.logKeepDays(per)
 				e.keepDays = 0
-				if caRate >= e.turnCa {
-					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
-				}
 				if caRate >= e.pinCa {
 					e.starIsUp = false
 					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.0f点(%.2f)->次级%s\n", e.log(per), e.log(e.lastPin), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
-					return
+				} else if caRate >= e.turnCa {
+					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
 				}
 			} else {
 				e.keepDays++
@@ -81,23 +83,25 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 
 func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 	if e.pin2 != 0 {
-		if per.val < e.pin2 && math.Abs(per.val-e.pin2)/e.pin1*100 > e.turnCa {
+		if per.val < e.pin2 {
 			e.keepDays++
-			fmt.Print(fmt.Sprintf(" %s 突破【关键点2】，%s趋势恢复\n", e.log(per), e.isUpStr(e.starIsUp)))
-			e.pin1 = 0
-			e.pin2 = 0
+			if math.Abs(per.val-e.pin2)/e.pin1*100 > e.turnCa {
+				fmt.Print(fmt.Sprintf(" %s 突破【关键点2】，%s趋势形成\n", e.log(per), e.isUpStr(e.starIsUp)))
+				e.pin1 = 0
+				e.pin2 = 0
+			} else {
+				fmt.Printf(" %s 突破【关键点2】，%s中\n", e.log(per), e.isUpStr(e.starIsUp))
+			}
 		} else {
 			if per.val > e.lastPin.val {
 				e.logKeepDays(per)
 				e.keepDays = 0
-				if caRate >= e.turnCa {
-					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
-				}
 				if caRate >= e.pinCa {
 					e.starIsUp = true
 					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.0f点(%.2f)->次级%s\n", e.log(per), e.log(e.lastPin), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
-					return
+				} else if caRate >= e.turnCa {
+					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
 				}
 			} else {
 				e.keepDays++
