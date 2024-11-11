@@ -11,7 +11,7 @@ type etfDays struct {
 	turnCa       float64     //逆转信号幅度 3%
 	pin1         *etfDaysPer //关键点1
 	pin2         *etfDaysPer //关键点2
-	starIsUp     bool
+	starIsUp     bool        //开始走势 升true，降false
 	lastPin      *etfDaysPer
 	keepDays     int
 	keepTurnDays int
