@@ -48,11 +48,11 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 				e.logKeepDays(per)
 				e.keepDays = 0
 				if caRate >= e.turnCa {
-					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点 %.2f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
 				}
 				if caRate >= e.pinCa {
 					e.starIsUp = false
-					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.2f点->次级%s\n", e.log(per), e.log(e.lastPin), caRate, e.isUpTmpStr(e.starIsUp)))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.0f点(%.2f)->次级%s\n", e.log(per), e.log(e.lastPin), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
 					return
 				}
@@ -91,11 +91,11 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 				e.logKeepDays(per)
 				e.keepDays = 0
 				if caRate >= e.turnCa {
-					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点 %.2f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]%s波动 %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
 				}
 				if caRate >= e.pinCa {
 					e.starIsUp = true
-					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.2f点->次级%s\n", e.log(per), e.log(e.lastPin), caRate, e.isUpTmpStr(e.starIsUp)))
+					fmt.Print(fmt.Sprintf(" %s 于[%s]转向 %.0f点(%.2f)->次级%s\n", e.log(per), e.log(e.lastPin), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
 					return
 				}
