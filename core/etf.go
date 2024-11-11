@@ -37,15 +37,15 @@ func (e *etfDays) think() {
 }
 
 func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
-	e.keepDays++
 	if e.pin1 != 0 {
 		if per.val > e.pin1 && math.Abs(per.val-e.pin1)/e.pin1*100 > e.turnCa {
+			e.keepDays++
 			fmt.Printf(" %s 突破【关键点1】，%s趋势恢复\n", e.log(per), e.isUpStr(e.starIsUp))
 			e.pin1 = 0
 			e.pin2 = 0
 		} else {
 			if e.lastPin.val > per.val {
-				fmt.Printf(" %s 持续%s后 %d天 反向\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
+				e.logKeepDays(per)
 				e.keepDays = 0
 				if caRate >= e.turnCa {
 					fmt.Print(fmt.Sprintf(" %s 于[%s]反向波动 %.0f点 %.2f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.turnCa, caRate))
@@ -57,12 +57,13 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 					return
 				}
 			} else {
+				e.keepDays++
 				e.lastPin = per
 			}
 		}
 	} else {
 		if e.lastPin.val > per.val {
-			fmt.Printf(" %s 持续%s后 %d天 反向\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
+			e.logKeepDays(per)
 			e.keepDays = 0
 			if caRate >= e.pinCa {
 				e.starIsUp = false
@@ -72,21 +73,22 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 				return
 			}
 		} else {
+			e.keepDays++
 			e.lastPin = per
 		}
 	}
 }
 
 func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
-	e.keepDays++
 	if e.pin2 != 0 {
 		if per.val < e.pin2 && math.Abs(per.val-e.pin2)/e.pin1*100 > e.turnCa {
+			e.keepDays++
 			fmt.Print(fmt.Sprintf(" %s 突破【关键点2】，%s趋势恢复\n", e.log(per), e.isUpStr(e.starIsUp)))
 			e.pin1 = 0
 			e.pin2 = 0
 		} else {
 			if per.val > e.lastPin.val {
-				fmt.Printf(" %s 持续%s后 %d天 反向\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
+				e.logKeepDays(per)
 				e.keepDays = 0
 				if caRate >= e.turnCa {
 					fmt.Print(fmt.Sprintf(" %s 于[%s]反向波动 %.0f点 %.2f【逆转警告】\n", e.log(per), e.log(e.lastPin), e.turnCa, caRate))
@@ -98,12 +100,13 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 					return
 				}
 			} else {
+				e.keepDays++
 				e.lastPin = per
 			}
 		}
 	} else {
 		if e.lastPin.val < per.val {
-			fmt.Printf(" %s 持续%s后 %d天 反向\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
+			e.logKeepDays(per)
 			e.keepDays = 0
 			if caRate >= e.pinCa {
 				e.starIsUp = true
@@ -113,6 +116,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 				return
 			}
 		} else {
+			e.keepDays++
 			e.lastPin = per
 		}
 	}
@@ -136,4 +140,11 @@ func (e *etfDays) isUpTmpStr(isUp bool) string {
 
 func (e *etfDays) log(per *etfDaysPer) string {
 	return fmt.Sprintf("%s %.4f", per.dateD, per.val)
+}
+
+func (e *etfDays) logKeepDays(per *etfDaysPer) {
+	if e.keepDays <= 0 {
+		return
+	}
+	fmt.Printf(" %s 持续%s %d天 反向日\n", e.log(per), e.isUpStr(e.starIsUp), e.keepDays)
 }
