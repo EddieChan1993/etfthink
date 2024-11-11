@@ -151,17 +151,22 @@ func (e *etfDays) log(per *etfDaysPer) string {
 
 // logKeepDays 确实同向增长
 func (e *etfDays) logKeepDays(per *etfDaysPer, isUp bool) {
+	if e.keepTurnDays > 0 {
+		fmt.Printf(" %s 于[%s]持续-%s- %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(!isUp), e.keepTurnDays)
+	}
 	e.keepTurnDays = 0
 	e.keepDays++
-	//fmt.Printf(" %s 于[%s]持续[%s] %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(isUp), e.keepDays)
-	fmt.Printf(" %s 持续[%s] %d天\n", e.log(per), e.isUpStr(isUp), e.keepDays)
+	//fmt.Printf(" %s 持续[%s] %d天\n", e.log(per), e.isUpStr(isUp), e.keepDays)
 }
 
 // logKeepTurnDays 确实反响增长
 func (e *etfDays) logKeepTurnDays(per *etfDaysPer, isUp bool) {
+	if e.keepDays > 0 {
+		fmt.Printf(" %s 之前持续[%s] %d天\n", e.log(per), e.isUpStr(!isUp), e.keepDays)
+	}
 	e.keepTurnDays++
 	e.keepDays = 0
-	fmt.Printf(" %s 于[%s]持续-%s- %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(isUp), e.keepTurnDays)
+	//fmt.Printf(" %s 于[%s]持续-%s- %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(isUp), e.keepTurnDays)
 }
 
 func (e *etfDays) pin(pinK int) string {
