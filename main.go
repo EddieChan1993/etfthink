@@ -3,5 +3,5 @@ package main
 import "etfthink/core"
 
 func main() {
-	core.Run("bb.xlsx", true)
+	core.Run("半导体.xlsx", true)
 }

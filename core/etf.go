@@ -13,6 +13,7 @@ type etfDays struct {
 	pin2     float64 //关键点2
 	starIsUp bool
 	oldPin   *etfDaysPer
+	keepDays int32
 }
 
 type etfDaysPer struct {
@@ -21,79 +22,97 @@ type etfDaysPer struct {
 }
 
 func (e *etfDays) think() {
-	isUp := e.starIsUp
-	fmt.Println(e.isUpStr(isUp))
+	fmt.Printf("//==================== %s 趋势====================//\n)", e.isUpStr(e.starIsUp))
 	e.oldPin = e.all[0]
+	caRate := 0.0
 	for _, per := range e.all {
-		caRate := math.Abs(e.oldPin.val-per.val) / e.oldPin.val * 100
-		if isUp {
-			if e.pin1 != 0 {
-				if per.val > e.pin1 && math.Abs(per.val-e.pin1)/e.pin1*100 > e.turnCa {
-					isUp = true
-					fmt.Print(fmt.Sprintf("%s %.4f -彻底突破关键点1，%s趋势形成\n", per.dateD, per.val, e.isUpStr(isUp)))
-					e.pin1 = 0
-					e.pin2 = 0
-				} else {
-					if e.oldPin.val > per.val {
-						if caRate >= e.turnCa {
-							fmt.Print(fmt.Sprintf("%s %.4f -反向=%.0f点 %.4f%%【逆转警告】\n", per.dateD, per.val, e.turnCa, caRate))
-						}
-						if caRate >= e.pinCa {
-							isUp = false
-							fmt.Print(fmt.Sprintf("%s %.4f -转向>=%.0f点-次级%s\n", per.dateD, e.pinCa, per.val, e.isUpTmpStr(isUp)))
-							e.oldPin = per
-						}
-					} else {
-						fmt.Print(fmt.Sprintf("%s %.4f -自然%s持续\n", per.dateD, per.val, e.isUpTmpStr(isUp)))
-						e.oldPin = per
-					}
+		caRate = math.Abs(e.oldPin.val-per.val) / e.oldPin.val * 100
+		if e.starIsUp {
+			e.upThink(per, caRate)
+		} else {
+			e.downThink(per, caRate)
+		}
+	}
+}
+
+func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
+	e.keepDays++
+	if e.pin1 != 0 {
+		if per.val > e.pin1 && math.Abs(per.val-e.pin1)/e.pin1*100 > e.turnCa {
+			fmt.Printf("%s %.4f -突破【关键点1】，%s趋势恢复\n", per.dateD, per.val, e.isUpStr(e.starIsUp))
+			e.pin1 = 0
+			e.pin2 = 0
+		} else {
+			if e.oldPin.val > per.val {
+				fmt.Printf("%s %.4f -持续%s后 %d天 反向\n", per.dateD, per.val, e.isUpStr(e.starIsUp), e.keepDays)
+				e.keepDays = 0
+				if caRate >= e.turnCa {
+					fmt.Printf("%s %.4f -反向波动 %.0f点 %.4f%%【逆转警告】\n", per.dateD, per.val, e.turnCa, caRate)
+				}
+				if caRate >= e.pinCa {
+					e.starIsUp = false
+					fmt.Printf("%s %.4f -转向>=%.0f点-次级%s\n", per.dateD, e.pinCa, per.val, e.isUpTmpStr(e.starIsUp))
+					e.oldPin = per
+					return
 				}
 			} else {
-				if e.oldPin.val > per.val {
-					if caRate >= e.pinCa {
-						isUp = false
-						fmt.Print(fmt.Sprintf("%s %.4f -【关键点1】-自然%s阶段\n", e.oldPin.dateD, e.oldPin.val, e.isUpTmpStr(isUp)))
-						e.oldPin = per
-						e.pin1 = per.val
-					}
-				} else {
-					e.oldPin = per
-				}
+				e.oldPin = per
+			}
+		}
+	} else {
+		if e.oldPin.val > per.val {
+			fmt.Printf("%s %.4f -持续%s后 %d天 反向\n", per.dateD, per.val, e.isUpStr(e.starIsUp), e.keepDays)
+			e.keepDays = 0
+			if caRate >= e.pinCa {
+				e.starIsUp = false
+				fmt.Printf("%s %.4f -【关键点1 - %s】开始进入-自然%s阶段\n", per.dateD, per.val, e.oldPin.dateD, e.isUpTmpStr(e.starIsUp))
+				e.oldPin = per
+				e.pin1 = per.val
+				return
 			}
 		} else {
-			if e.pin2 != 0 {
-				if per.val < e.pin2 && math.Abs(per.val-e.pin2)/e.pin1*100 > e.turnCa {
-					isUp = false
-					fmt.Print(fmt.Sprintf("%s %.4f -彻底突破关键点2，%s趋势形成\n", per.dateD, per.val, e.isUpStr(isUp)))
-					e.pin1 = 0
-					e.pin2 = 0
-				} else {
-					if per.val > e.oldPin.val {
-						if caRate >= e.turnCa {
-							fmt.Print(fmt.Sprintf("%s %.4f -反向=%.0f点 %.4f%%【逆转警告】\n", per.dateD, per.val, e.turnCa, caRate))
-						}
-						if caRate >= e.pinCa {
-							isUp = true
-							fmt.Print(fmt.Sprintf("%s %.4f -转向>=%.0f点-次级%s\n", per.dateD, e.pinCa, per.val, e.isUpTmpStr(isUp)))
-							e.oldPin = per
-						}
-					} else {
-						fmt.Print(fmt.Sprintf("%s %.4f -自然%s持续\n", per.dateD, per.val, e.isUpTmpStr(isUp)))
-						e.oldPin = per
-					}
+			e.oldPin = per
+		}
+	}
+}
+
+func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
+	e.keepDays++
+	if e.pin2 != 0 {
+		if per.val < e.pin2 && math.Abs(per.val-e.pin2)/e.pin1*100 > e.turnCa {
+			fmt.Print(fmt.Sprintf("%s %.4f -突破【关键点2】，%s趋势恢复\n", per.dateD, per.val, e.isUpStr(e.starIsUp)))
+			e.pin1 = 0
+			e.pin2 = 0
+		} else {
+			if per.val > e.oldPin.val {
+				fmt.Printf("%s %.4f -持续%s后 %d天 反向\n", per.dateD, per.val, e.isUpStr(e.starIsUp), e.keepDays)
+				e.keepDays = 0
+				if caRate >= e.turnCa {
+					fmt.Print(fmt.Sprintf("%s %.4f -反向波动 %.0f点 %.4f%%【逆转警告】\n", per.dateD, per.val, e.turnCa, caRate))
+				}
+				if caRate >= e.pinCa {
+					e.starIsUp = true
+					fmt.Print(fmt.Sprintf("%s %.4f -转向>=%.0f点-次级%s\n", per.dateD, e.pinCa, per.val, e.isUpTmpStr(e.starIsUp)))
+					e.oldPin = per
+					return
 				}
 			} else {
-				if e.oldPin.val < per.val {
-					if caRate >= e.pinCa {
-						isUp = true
-						fmt.Print(fmt.Sprintf("%s %.4f -【关键点2】-自然%s阶段\n", e.oldPin.dateD, e.oldPin.val, e.isUpTmpStr(isUp)))
-						e.oldPin = per
-						e.pin2 = per.val
-					}
-				} else {
-					e.oldPin = per
-				}
+				e.oldPin = per
 			}
+		}
+	} else {
+		if e.oldPin.val < per.val {
+			fmt.Printf("%s %.4f -持续%s后 %d天 反向\n", per.dateD, per.val, e.isUpStr(e.starIsUp), e.keepDays)
+			e.keepDays = 0
+			if caRate >= e.pinCa {
+				e.starIsUp = true
+				fmt.Printf("%s %.4f -【关键点2 - %s】开始进入-自然%s阶段\n", per.dateD, per.val, e.oldPin.dateD, e.isUpTmpStr(e.starIsUp))
+				e.oldPin = per
+				e.pin2 = per.val
+				return
+			}
+		} else {
+			e.oldPin = per
 		}
 	}
 }
