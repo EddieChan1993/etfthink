@@ -110,7 +110,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 			e.keepDays = 0
 			if caRate >= e.pinCa {
 				e.starIsUp = true
-				fmt.Printf(" %s 【关键点2 %s】开始进入->自然%s阶段\n", e.log(per), e.lastPin.dateD, e.isUpTmpStr(e.starIsUp))
+				fmt.Printf(" %s【关键点2 %s】开始进入->自然%s阶段\n", e.log(per), e.lastPin.dateD, e.isUpTmpStr(e.starIsUp))
 				e.pin2 = e.lastPin.val
 				e.lastPin = per
 				return
