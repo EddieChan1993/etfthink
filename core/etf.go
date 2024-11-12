@@ -40,7 +40,7 @@ func (e *etfDays) think() {
 func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 	if e.pin1.val != 0 {
 		if per.val > e.pin1.val {
-			e.logKeepDays(per, e.starIsUp)
+			e.logKeepDays(per, e.starIsUp, caRate)
 			e.lastPin = per
 			if math.Abs(per.val-e.pin1.val)/e.pin1.val*100 > e.turnCa {
 				fmt.Printf(" %s 彻底突破【%s】%s趋势形成\n", e.log(per), e.pin(1), e.isUpStr(e.starIsUp))
@@ -51,7 +51,7 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 			}
 		} else {
 			if e.lastPin.val > per.val {
-				e.logKeepTurnDays(per, !e.starIsUp)
+				e.logKeepTurnDays(per, !e.starIsUp, caRate)
 				if caRate >= e.pinCa {
 					e.starIsUp = false
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)->次级%s阶段\n", e.log(per), e.log(e.lastPin), e.isUpStr(e.starIsUp), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
@@ -61,13 +61,13 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
 				}
 			} else {
-				e.logKeepDays(per, e.starIsUp)
+				e.logKeepDays(per, e.starIsUp, caRate)
 				e.lastPin = per
 			}
 		}
 	} else {
 		if e.lastPin.val > per.val {
-			e.logKeepTurnDays(per, !e.starIsUp)
+			e.logKeepTurnDays(per, !e.starIsUp, caRate)
 			if caRate >= e.pinCa {
 				e.starIsUp = false
 				e.pin1 = e.lastPin
@@ -77,7 +77,7 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 				return
 			}
 		} else {
-			e.logKeepDays(per, e.starIsUp)
+			e.logKeepDays(per, e.starIsUp, caRate)
 			e.lastPin = per
 		}
 	}
@@ -86,7 +86,7 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 	if e.pin2.val != 0 {
 		if per.val < e.pin2.val {
-			e.logKeepDays(per, e.starIsUp)
+			e.logKeepDays(per, e.starIsUp, caRate)
 			e.lastPin = per
 			if math.Abs(per.val-e.pin2.val)/e.pin1.val*100 > e.turnCa {
 				fmt.Print(fmt.Sprintf(" %s 突破【%s】%s趋势形成\n", e.log(per), e.pin(2), e.isUpStr(e.starIsUp)))
@@ -97,7 +97,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 			}
 		} else {
 			if per.val > e.lastPin.val {
-				e.logKeepTurnDays(per, !e.starIsUp)
+				e.logKeepTurnDays(per, !e.starIsUp, caRate)
 				if caRate >= e.pinCa {
 					e.starIsUp = true
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)->次级%s阶段\n", e.log(per), e.log(e.lastPin), e.isUpStr(e.starIsUp), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
@@ -107,13 +107,13 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)【逆转警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate))
 				}
 			} else {
-				e.logKeepDays(per, e.starIsUp)
+				e.logKeepDays(per, e.starIsUp, caRate)
 				e.lastPin = per
 			}
 		}
 	} else {
 		if e.lastPin.val < per.val {
-			e.logKeepTurnDays(per, !e.starIsUp)
+			e.logKeepTurnDays(per, !e.starIsUp, caRate)
 			if caRate >= e.pinCa {
 				e.starIsUp = true
 				e.pin2 = e.lastPin
@@ -123,7 +123,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 				return
 			}
 		} else {
-			e.logKeepDays(per, e.starIsUp)
+			e.logKeepDays(per, e.starIsUp, caRate)
 			e.lastPin = per
 		}
 	}
@@ -150,22 +150,18 @@ func (e *etfDays) log(per *etfDaysPer) string {
 }
 
 // logKeepDays 确实同向增长
-func (e *etfDays) logKeepDays(per *etfDaysPer, isUp bool) {
-	if e.keepTurnDays > 0 {
-		fmt.Printf(" %s 于[%s]持续-%s- %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(!isUp), e.keepTurnDays)
-	}
-	e.keepTurnDays = 0
-	e.keepDays++
+func (e *etfDays) logKeepDays(per *etfDaysPer, isUp bool, caRate float64) {
+	//if e.keepTurnDays > 0 {
+	//	fmt.Printf(" %s 于[%s]持续-%s- %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(!isUp), e.keepTurnDays)
+	//}
+	//e.keepTurnDays = 0
+	fmt.Print(fmt.Sprintf(" %s 于[%s][%s]幅度 %.2f点\n", e.log(per), e.log(e.lastPin), e.isUpStr(isUp), caRate))
 	//fmt.Printf(" %s 持续[%s] %d天\n", e.log(per), e.isUpStr(isUp), e.keepDays)
 }
 
 // logKeepTurnDays 确实反响增长
-func (e *etfDays) logKeepTurnDays(per *etfDaysPer, isUp bool) {
-	if e.keepDays > 0 {
-		fmt.Printf(" %s 之前持续[%s] %d天\n", e.log(per), e.isUpStr(!isUp), e.keepDays)
-	}
-	e.keepTurnDays++
-	e.keepDays = 0
+func (e *etfDays) logKeepTurnDays(per *etfDaysPer, isUp bool, caRate float64) {
+	fmt.Print(fmt.Sprintf(" %s 于[%s]-%s-幅度 %.2f点\n", e.log(per), e.log(e.lastPin), e.isUpStr(isUp), caRate))
 	//fmt.Printf(" %s 于[%s]持续-%s- %d天\n", e.log(per), e.log(e.lastPin), e.isUpStr(isUp), e.keepTurnDays)
 }
 
