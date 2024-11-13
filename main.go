@@ -23,7 +23,7 @@ func main() {
 	core.Run(path, isUp)
 
 	fs := http.FileServer(http.Dir("html"))
-	log.Println("running server at http://localhost:" + port)
+	log.Println("running server at http://localhost:" + port + "/line.html")
 	log.Fatal(http.ListenAndServe("localhost:"+port, logRequest(fs)))
 }
 
