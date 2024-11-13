@@ -18,13 +18,14 @@ func Run(path string, isUp bool) {
 		lastPin:  nil,
 		keepDays: 0,
 	}
-	etfInsData, lineChart := initEtfData(path)
+	etfInsData, lineChartIns := initEtfData(path)
 	etfIns.all = etfInsData
-	etfIns.think()
-	lineChart.ioWrite()
+	points := etfIns.think()
+	lineChartIns.setPoints(points)
+	lineChartIns.ioWrite()
 }
 
-func initEtfData(path string) ([]*etfDaysPer, *lineChartIns) {
+func initEtfData(path string) ([]*etfDaysPer, *lineChart) {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		fmt.Println(err)
@@ -54,9 +55,9 @@ func initEtfData(path string) ([]*etfDaysPer, *lineChartIns) {
 		y = append(y, cast.ToFloat32(rows[i][1]))
 	}
 	filename := filepath.Base(path)
-	return res, &lineChartIns{
+	return res, &lineChart{
 		x:     x,
-		data:  y,
+		y:     y,
 		title: filename,
 	}
 }

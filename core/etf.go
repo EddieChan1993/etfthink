@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/EddieChan1993/gcore/utils/cast"
 	"math"
 )
 
@@ -22,7 +23,7 @@ type etfDaysPer struct {
 	val   float64
 }
 
-func (e *etfDays) think() {
+func (e *etfDays) think() (points map[string]float32) {
 	fmt.Printf("//==================== %s 趋势====================//\n", e.isUpStr(e.starIsUp))
 	e.lastPin = e.all[0]
 	caRate := 0.0
@@ -35,6 +36,10 @@ func (e *etfDays) think() {
 		}
 	}
 	fmt.Printf("//==================== End ====================//\n")
+	return map[string]float32{
+		e.pin1.dateD: cast.ToFloat32(e.pin1.val),
+		e.pin2.dateD: cast.ToFloat32(e.pin2.val),
+	}
 }
 
 func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
