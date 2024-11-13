@@ -64,6 +64,8 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 					e.lastPin = per
 					e.keepTurnDays, e.keepDays = e.keepDays, e.keepTurnDays
 				} else if caRate >= e.turnCa {
+					e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
+					e.points[per.dateD] = cast.ToFloat32(per.val)
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)【%s警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate, e.isUpTmpStr(!e.starIsUp)))
 				}
 			} else {
@@ -115,6 +117,8 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 					e.lastPin = per
 					e.keepTurnDays, e.keepDays = e.keepDays, e.keepTurnDays
 				} else if caRate >= e.turnCa {
+					e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
+					e.points[per.dateD] = cast.ToFloat32(per.val)
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)【%s警告】\n", e.log(per), e.log(e.lastPin), e.isUpStr(!e.starIsUp), e.turnCa, caRate, e.isUpTmpStr(!e.starIsUp)))
 				}
 			} else {
