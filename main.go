@@ -14,7 +14,7 @@ const port = "1234"
 func main() {
 	args := os.Args
 	if len(args) != 3 {
-		fmt.Println("etfthink path isUp(bool)")
+		fmt.Println("etfthink path.xlsx isUp(bool)")
 		return
 	}
 	path := cast.ToString(args[1])
