@@ -16,6 +16,7 @@ type etfDays struct {
 	lastPin      *etfDaysPer
 	keepDays     int
 	keepTurnDays int
+	points       map[string]float32 //重要节点
 }
 
 type etfDaysPer struct {
@@ -36,10 +37,7 @@ func (e *etfDays) think() (points map[string]float32) {
 		}
 	}
 	fmt.Printf("//==================== End ====================//\n")
-	return map[string]float32{
-		e.pin1.dateD: cast.ToFloat32(e.pin1.val),
-		e.pin2.dateD: cast.ToFloat32(e.pin2.val),
-	}
+	return e.points
 }
 
 func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
@@ -48,16 +46,19 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 			e.logKeepDays(per, e.starIsUp, caRate)
 			e.lastPin = per
 			if math.Abs(per.val-e.pin1.val)/e.pin1.val*100 > e.turnCa {
-				fmt.Printf(" %s 彻底突破【%s】%s趋势形成\n", e.log(per), e.pin(1), e.isUpStr(e.starIsUp))
+				fmt.Printf(" %s 彻底突破【%s】%s趋势恢复\n", e.log(per), e.pin(1), e.isUpStr(e.starIsUp))
 				e.pin1 = &etfDaysPer{}
 				e.pin2 = &etfDaysPer{}
+				e.points[per.dateD] = cast.ToFloat32(per.val)
 			} else {
-				fmt.Printf(" %s 突破【%s】%s 趋势正在形成\n", e.log(per), e.pin(2), e.isUpStr(e.starIsUp))
+				fmt.Printf(" %s 突破【%s】%s 趋势进行中..\n", e.log(per), e.pin(2), e.isUpStr(e.starIsUp))
 			}
 		} else {
 			if e.lastPin.val > per.val {
 				e.logKeepTurnDays(per, !e.starIsUp, caRate)
 				if caRate >= e.pinCa {
+					e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
+					e.points[per.dateD] = cast.ToFloat32(per.val)
 					e.starIsUp = false
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)->次级%s阶段\n", e.log(per), e.log(e.lastPin), e.isUpStr(e.starIsUp), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
@@ -74,6 +75,7 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 		if e.lastPin.val > per.val {
 			e.logKeepTurnDays(per, !e.starIsUp, caRate)
 			if caRate >= e.pinCa {
+				e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
 				e.starIsUp = false
 				e.pin1 = e.lastPin
 				e.lastPin = per
@@ -94,16 +96,20 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 			e.logKeepDays(per, e.starIsUp, caRate)
 			e.lastPin = per
 			if math.Abs(per.val-e.pin2.val)/e.pin1.val*100 > e.turnCa {
-				fmt.Print(fmt.Sprintf(" %s 突破【%s】%s趋势形成\n", e.log(per), e.pin(2), e.isUpStr(e.starIsUp)))
+				fmt.Printf(" %s 彻底突破【%s】%s趋势恢复\n", e.log(per), e.pin(1), e.isUpStr(e.starIsUp))
+				e.points[per.dateD] = cast.ToFloat32(per.val)
 				e.pin1 = &etfDaysPer{}
 				e.pin2 = &etfDaysPer{}
 			} else {
-				fmt.Printf(" %s 突破【%s】%s 趋势正在形成\n", e.log(per), e.pin(2), e.isUpStr(e.starIsUp))
+				e.points[per.dateD] = cast.ToFloat32(per.val)
+				fmt.Printf(" %s 突破【%s】%s 趋势进行中..\n", e.log(per), e.pin(2), e.isUpStr(e.starIsUp))
 			}
 		} else {
 			if per.val > e.lastPin.val {
 				e.logKeepTurnDays(per, !e.starIsUp, caRate)
 				if caRate >= e.pinCa {
+					e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
+					e.points[per.dateD] = cast.ToFloat32(per.val)
 					e.starIsUp = true
 					fmt.Print(fmt.Sprintf(" %s 于[%s]%s幅度>= %.0f点(%.2f)->次级%s阶段\n", e.log(per), e.log(e.lastPin), e.isUpStr(e.starIsUp), e.pinCa, caRate, e.isUpTmpStr(e.starIsUp)))
 					e.lastPin = per
@@ -120,6 +126,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 		if e.lastPin.val < per.val {
 			e.logKeepTurnDays(per, !e.starIsUp, caRate)
 			if caRate >= e.pinCa {
+				e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
 				e.starIsUp = true
 				e.pin2 = e.lastPin
 				e.lastPin = per
