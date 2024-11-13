@@ -1,5 +1,7 @@
 github.com/EddieChan1993/gcore v1.2.1 h1:UXaQXFhtuxVnSU5fbTo+DcR6yAQC5Ips4VmPKFaIK6U=
 github.com/EddieChan1993/gcore v1.2.1/go.mod h1:Sob5bZ1Oqcg2GC7TkLz+17emban1OMNagWR3qodoSQ4=
+github.com/go-echarts/go-echarts/v2 v2.4.5 h1:gwDqxdi5x329sg+g2ws2OklreJ1K34FCimraInurzwk=
+github.com/go-echarts/go-echarts/v2 v2.4.5/go.mod h1:56YlvzhW/a+du15f3S2qUGNDfKnFOeJSThBIrVFHDtI=
 github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 h1:RWengNIwukTxcDr9M+97sNutRR1RKhG96O6jWumTTnw=
 github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826/go.mod h1:TaXosZuwdSHYgviHp1DAtfrULt5eUgsSMsZf+YrPgl8=
 github.com/richardlehane/mscfb v1.0.4 h1:WULscsljNPConisD5hR0+OyZjwK46Pfyr6mPu5ZawpM=

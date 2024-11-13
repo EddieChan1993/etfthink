@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/EddieChan1993/gcore v1.2.1 // indirect
+	github.com/go-echarts/go-echarts/v2 v2.4.5 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.4 // indirect

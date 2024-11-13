@@ -2,7 +2,9 @@ package core
 
 import (
 	"fmt"
+	"github.com/EddieChan1993/gcore/utils/cast"
 	"github.com/xuri/excelize/v2"
+	"path/filepath"
 )
 
 func Run(path string, isUp bool) {
@@ -16,15 +18,17 @@ func Run(path string, isUp bool) {
 		lastPin:  nil,
 		keepDays: 0,
 	}
-	etfIns.all = initEtfData(path)
+	etfInsData, lineChart := initEtfData(path)
+	etfIns.all = etfInsData
 	etfIns.think()
+	lineChart.ioWrite()
 }
 
-func initEtfData(path string) []*etfDaysPer {
+func initEtfData(path string) ([]*etfDaysPer, *lineChartIns) {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return nil, nil
 	}
 	defer func() {
 		// Close the spreadsheet.
@@ -36,14 +40,23 @@ func initEtfData(path string) []*etfDaysPer {
 	rows, err := f.GetRows("Sheet1")
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return nil, nil
 	}
 	res := make([]*etfDaysPer, 0, len(rows))
+	x := make([]string, 0, len(rows))
+	y := make([]float32, 0, len(rows))
 	for i := len(rows) - 1; i >= 0; i-- {
 		res = append(res, &etfDaysPer{
 			dateD: rows[i][0],
-			val:   ToFloat64(rows[i][1]),
+			val:   cast.ToFloat64(rows[i][1]),
 		})
+		x = append(x, rows[i][0])
+		y = append(y, cast.ToFloat32(rows[i][1]))
 	}
-	return res
+	filename := filepath.Base(path)
+	return res, &lineChartIns{
+		x:     x,
+		data:  y,
+		title: filename,
+	}
 }
