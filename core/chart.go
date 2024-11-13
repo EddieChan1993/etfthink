@@ -29,7 +29,7 @@ func (l *lineChartIns) lineBase() *charts.Line {
 	)
 
 	line.SetXAxis(l.x).
-		AddSeries("Category A", l.lineData())
+		AddSeries("单位净值", l.lineData())
 	return line
 }
 
