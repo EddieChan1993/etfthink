@@ -78,6 +78,7 @@ func (e *etfDays) upThink(per *etfDaysPer, caRate float64) {
 			e.logKeepTurnDays(per, !e.starIsUp, caRate)
 			if caRate >= e.pinCa {
 				e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
+				e.points[per.dateD] = cast.ToFloat32(per.val)
 				e.starIsUp = false
 				e.pin1 = e.lastPin
 				e.lastPin = per
@@ -131,6 +132,7 @@ func (e *etfDays) downThink(per *etfDaysPer, caRate float64) {
 			e.logKeepTurnDays(per, !e.starIsUp, caRate)
 			if caRate >= e.pinCa {
 				e.points[e.lastPin.dateD] = cast.ToFloat32(e.lastPin.val)
+				e.points[per.dateD] = cast.ToFloat32(per.val)
 				e.starIsUp = true
 				e.pin2 = e.lastPin
 				e.lastPin = per
